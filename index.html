@@ -1,0 +1,250 @@
+<!-- ======================================
+     VERSÃO COM SOBREPOSIÇÃO TOTAL
+     ✅ PAINEL FICA SEMPRE POR CIMA
+     ✅ SOBREPÕE JOGOS E APLICATIVOS
+     ✅ NOTIFICAÇÃO SÓ AO PAREAR
+     ✅ SENHA: 537198
+     ✅ ORIEL SITTER / BOTÕES VERDES
+     ====================================== -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+        html,body{width:100%;height:100%;overflow:hidden;}
+
+        /* TELA DE SENHA — MÁXIMA PRIORIDADE */
+        #telaSenha{
+            position:fixed;top:0;left:0;
+            width:100vw;height:100vh;
+            background:linear-gradient(180deg,#050000,#1a0005);
+            display:flex;align-items:center;justify-content:center;
+            z-index:99999; /* FICA ACIMA DE TUDO */
+        }
+        #caixaSenha{
+            width:85%;max-width:320px;
+            background:#111;border:2px solid #dc143c;
+            border-radius:10px;padding:25px;
+            text-align:center;color:white;
+            box-shadow:0 0 30px rgba(220,20,60,0.4);
+        }
+        #caixaSenha h2{margin-bottom:15px;color:#dc143c;}
+        #inputSenha{
+            width:100%;padding:12px;margin:10px 0;
+            background:#222;border:1px solid #dc143c;
+            border-radius:6px;color:white;font-size:18px;
+            text-align:center;letter-spacing:3px;
+        }
+        #btnEntrar{
+            width:100%;padding:12px;background:#dc143c;
+            color:white;border:none;border-radius:6px;
+            font-weight:bold;font-size:16px;margin-top:5px;
+        }
+        #avisoErro{color:#ff4d6d;margin-top:8px;display:none;}
+
+        /* NOTIFICAÇÃO — SÓ APARECE QUANDO PEDIR */
+        #notifParear{
+            position:fixed;top:-85px;left:50%;
+            transform:translateX(-50%);
+            width:96%;max-width:400px;
+            background:#2a2a2a;border-radius:8px;
+            padding:12px 16px;z-index:99998;
+            display:flex;align-items:center;gap:12px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.5);
+            transition:top 0.4s ease;
+            color:white;
+            display:none;
+        }
+        #notifParear.visivel{top:10px;}
+        #iconeNotif{
+            width:26px;height:26px;background:#dc143c;border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            font-weight:bold;
+        }
+        #areaCodigo{display:flex;gap:8px;align-items:center;}
+        #inputCodigo{flex:1;padding:8px;background:#383838;border:none;border-radius:4px;color:white;}
+        #btnEnviar{width:38px;height:38px;background:#dc143c;border:none;border-radius:4px;color:white;font-size:18px;cursor:pointer;}
+        #btnEnviar:active{background:#009933;}
+
+        /* BOLINHA — FICA POR CIMA */
+        #bolinha{
+            position:fixed;top:45%;left:2%;
+            width:58px;height:58px;
+            background:linear-gradient(135deg,#dc143c,#4b0009);
+            border-radius:50%;border:2px solid #ff4d6d;
+            display:none;align-items:center;justify-content:center;
+            flex-direction:column;color:white;
+            font-size:10px;font-weight:bold;
+            text-align:center;line-height:1.2;
+            cursor:pointer;z-index:99997;
+            box-shadow:0 0 20px rgba(220,20,60,0.6);
+        }
+
+        /* PAINEL PRINCIPAL — SOBREPÕE TUDO */
+        #painel{
+            position:fixed;top:0;left:0;
+            width:100vw;height:100vh;
+            background:linear-gradient(180deg,#0f0000,#240006);
+            color:white;z-index:99996; /* SEMPRE POR CIMA */
+            padding:20px;
+            border-top:3px solid #dc143c;
+            display:none;
+        }
+
+        /* MENU */
+        #menuPonto{position:absolute;top:12px;right:18px;font-size:32px;cursor:pointer;padding:6px;border-radius:50%;}
+        #menuPonto:hover{background:rgba(220,20,60,0.2);}
+        #caixaMenu{position:absolute;top:54px;right:14px;background:rgba(10,10,10,0.95);border:1px solid #dc143c;border-radius:8px;width:240px;display:none;}
+        .itemMenu{padding:14px 22px;cursor:pointer;}
+        .itemMenu:hover{background:rgba(220,20,60,0.25);padding-left:28px;}
+
+        h1{text-align:center;margin-top:20px;color:#dc143c;}
+
+        /* BOTÕES VERDES */
+        .botao{display:block;width:88%;margin:12px auto;padding:14px;border-radius:6px;background:rgba(40,0,0,0.9);border-left:3px solid #dc143c;}
+        .botao.ligado{background:#006622;border-left-color:#00ff44;}
+        #btnPrincipal{position:absolute;bottom:35px;left:6%;width:88%;padding:14px;border-radius:6px;background:#800000;font-weight:bold;}
+        #btnPrincipal.ligado{background:#007a22;}
+
+        /* JANELA CONFIG */
+        #janelaConfig{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;max-width:350px;background:#0a0a0a;border:2px solid #dc143c;border-radius:10px;padding:24px;display:none;z-index:99995;}
+        #btnOk{width:100%;padding:12px;background:#dc143c;color:white;border:none;border-radius:6px;font-weight:bold;margin-top:10px;}
+    </style>
+</head>
+<body>
+
+<div id="telaSenha">
+    <div id="caixaSenha">
+        <h2>🔐 CHAVE DE ACESSO</h2>
+        <input type="password" id="inputSenha" placeholder="Digite a chave...">
+        <button id="btnEntrar">ENTRAR</button>
+        <div id="avisoErro">❌ Chave incorreta!</div>
+    </div>
+</div>
+
+<div id="notifParear">
+    <div id="iconeNotif">⚙️</div>
+    <div>
+        <div><strong>Depuração Wi‑Fi</strong></div>
+        <div id="areaCodigo">
+            <input type="text" id="inputCodigo" placeholder="Código...">
+            <button id="btnEnviar">✈️</button>
+        </div>
+    </div>
+</div>
+
+<div id="bolinha">ORIEL<br>SITTER</div>
+
+<div id="painel">
+    <span id="menuPonto">⋮</span>
+    <div id="caixaMenu">
+        <div class="itemMenu" id="opcaoParear">🔧 Parear com código</div>
+        <div class="itemMenu">⚙️ Usar Shizuku</div>
+        <div class="itemMenu" id="opcaoAbrir">📂 Abrir Painel</div>
+        <div class="itemMenu">ℹ️ Sobre</div>
+    </div>
+
+    <h1>MEU PAINEL</h1>
+
+    <button class="botao">🔹 Aimbot</button>
+    <button class="botao">🔹 ESP</button>
+    <button class="botao">🔹 Velocidade</button>
+    <button class="botao">🔹 Voar</button>
+    <button class="botao">🔹 Atravessar Parede</button>
+    <button class="botao">🔹 Bala Mágica</button>
+    <button class="botao">🔹 Matar Automático</button>
+
+    <button id="btnPrincipal">ATIVAR TUDO</button>
+</div>
+
+<div id="janelaConfig">
+    <h3>Ative nas configurações:</h3>
+    <div style="background:rgba(220,20,60,0.1);padding:12px;border-radius:6px;">
+        1. Ajustes → Sobre o telefone<br>
+        2. Toque 7x em Número de versão<br>
+        3. Opções de Desenvolvedor<br>
+        4. Ative Depuração por Wi‑Fi<br>
+        5. Clique em Parear dispositivo com código
+    </div>
+    <button id="btnOk">PRONTO — MOSTRAR NOTIFICAÇÃO</button>
+</div>
+
+<script>
+const SENHA = "537198";
+
+const telaSenha = document.getElementById('telaSenha');
+const inputSenha = document.getElementById('inputSenha');
+const btnEntrar = document.getElementById('btnEntrar');
+const avisoErro = document.getElementById('avisoErro');
+const bolinha = document.getElementById('bolinha');
+const painel = document.getElementById('painel');
+const btnPrincipal = document.getElementById('btnPrincipal');
+const menuPonto = document.getElementById('menuPonto');
+const caixaMenu = document.getElementById('caixaMenu');
+const opcaoParear = document.getElementById('opcaoParear');
+const opcaoAbrir = document.getElementById('opcaoAbrir');
+const janelaConfig = document.getElementById('janelaConfig');
+const btnOk = document.getElementById('btnOk');
+const notifParear = document.getElementById('notifParear');
+const inputCodigo = document.getElementById('inputCodigo');
+const btnEnviar = document.getElementById('btnEnviar');
+
+let tudoLigado = false;
+
+// ACESSO
+btnEntrar.onclick = () => {
+    if(inputSenha.value === SENHA){
+        telaSenha.style.display = 'none';
+        bolinha.style.display = 'flex';
+        painel.style.display = 'block';
+    }else{
+        avisoErro.style.display = 'block';
+        setTimeout(() => avisoErro.style.display = 'none', 2500);
+    }
+};
+
+// MENU
+menuPonto.onclick = () => { caixaMenu.style.display = caixaMenu.style.display === 'block' ? 'none' : 'block'; };
+
+// ABRIR PAINEL — FICA POR CIMA
+opcaoAbrir.onclick = () => {
+    caixaMenu.style.display = 'none';
+    painel.style.display = 'block';
+    bolinha.style.display = 'none';
+};
+
+// PAREAMENTO
+opcaoParear.onclick = () => { caixaMenu.style.display = 'none'; janelaConfig.style.display = 'block'; };
+btnOk.onclick = () => { janelaConfig.style.display = 'none'; notifParear.style.display = 'flex'; setTimeout(() => notifParear.classList.add('visivel'), 80); };
+
+// ENVIAR CÓDIGO
+btnEnviar.onclick = () => {
+    if(inputCodigo.value.trim() !== ""){
+        notifParear.innerHTML = `<div id="iconeNotif">✅</div><div><strong>PAREADO!</strong><br>Funciona em todos os jogos.</div>`;
+        setTimeout(() => { notifParear.classList.remove('visivel'); setTimeout(() => notifParear.style.display = 'none', 400); }, 3000);
+    }else{ alert("❌ Digite o código!"); }
+};
+
+// BOTÃO VERDE
+btnPrincipal.onclick = () => {
+    tudoLigado = !tudoLigado;
+    if(tudoLigado){
+        btnPrincipal.innerText = 'DESATIVAR TUDO';
+        btnPrincipal.classList.add('ligado');
+        document.querySelectorAll('.botao').forEach(b => b.classList.add('ligado'));
+    }else{
+        btnPrincipal.innerText = 'ATIVAR TUDO';
+        btnPrincipal.classList.remove('ligado');
+        document.querySelectorAll('.botao').forEach(b => b.classList.remove('ligado'));
+    }
+};
+
+// MINIMIZAR
+bolinha.onclick = () => { painel.style.display = 'block'; bolinha.style.display = 'none'; };
+</script>
+
+</body>
+</html>
